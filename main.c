@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 enum {
     Binary = 0,
@@ -7,11 +8,84 @@ enum {
     Hexa,
 
     MAX_COUNT = 3
-};
+} CONVERT_TYPES;
 
-#define         BINARIO 2;
-#define         OCTAL   8;
-#define         HEXA    16;
+#define         BINARIO     2
+#define         OCTAL       8
+#define         HEXA        16
+#define         MAX_CHAR    100
+
+void HandleFirstOption(int Decimal, int Option);
+void HandleSecondOption(char* Aux, int Option);
+char* HandleHexa(int Left);
+void ConvertDecimalToOthers(int Decimal, int Divisor);
+int ConvertOtherToDecimal(char* Aux, int Multiply);
+
+int main() {
+    system("cls");
+    int FirstOption = 0;
+    int SecondOption = 0;
+    int Index = 1;
+
+    while (FirstOption >= 0) {
+        int Decimal = 0;
+        
+        printf ("********************\n");
+        printf ("[1] - Decimal para os demais formatos\n");
+        printf ("[2] - Demais formatos para decimal\n");
+        printf ("[3] - Limpar a tela\n");
+        printf ("Opcao: ");
+        scanf ("%d", &FirstOption);
+        printf ("********************\n");
+
+        switch(FirstOption) {
+            case 1:
+                while (Decimal <= 0) {
+                    printf ("Digite um numero maior que 0:\n");
+                    scanf ("%d", &Decimal);
+                }
+
+                printf ("Digite:\n[1] - Binario\n[2] - Octal\n[3] - Hexadecimal\n[4] - Todos\n\n");
+                printf ("Opcao: ");
+                scanf ("%d", &SecondOption);
+                printf ("\n");
+
+                HandleFirstOption(Decimal, SecondOption - Index);
+                printf ("\n\n");
+            break;
+            case 2:
+                char* Aux = (char*)calloc(MAX_CHAR, sizeof(char));
+
+                printf ("Digite um valor:\n");
+                scanf ("%s", Aux);
+                fflush(stdin);
+                printf ("********************\n");
+
+                printf ("Selecione uma opcao:\n[1] - Binario\n[2] - Octal\n[3] - Hexadecimal\n\n\n");
+                printf ("Opcao: ");
+                scanf ("%d", &SecondOption);
+                printf ("********************\n");
+
+                HandleSecondOption(Aux, SecondOption - Index);
+
+                printf ("\n\n");
+
+                free(Aux);
+                Aux = NULL;
+            break;
+            case 3:
+                system("cls");
+                break;
+            default:
+                printf ("Opcao Invalida !");
+                system("cls");
+            break;
+        }
+    }
+    printf ("********************\n");
+
+    return 0;
+}
 
 char* HandleHexa(int Left) {
     switch(Left) {
@@ -39,27 +113,20 @@ char* HandleHexa(int Left) {
     }
 }
 
-void Convert(int Decimal, int Divisor) {
+void ConvertDecimalToOthers(int Decimal, int Divisor) {
     char* Result = NULL;
     int Exit = 0;
 
-    // printf ("Decimal: %d - Divisor: %d\n", Decimal, Divisor);
-    
     while (Decimal > 0) {
         int Left = Decimal % Divisor;
-        // printf ("Left: %d\n", Left);
 
         if (Result == NULL) {
-            // printf ("Malloc\n");
-            Result = (char*)calloc(2, 2);
+            Result = (char*)calloc(2, sizeof(char));
         } else {
-            // printf ("Realloc\n");
             int ResultSize = sizeof(Result) + sizeof(char) * 1;
-            // printf ("ResultSize: %d\n", ResultSize);
+
             Result = (char*)realloc(Result, ResultSize);
         }
-        // printf ("SizeOfResult: %zd\n", sizeof(Result));
-
         char* Aux = malloc(sizeof(char) + 1);
 
         if (Divisor == 16 && Left >= 10) {
@@ -71,19 +138,13 @@ void Convert(int Decimal, int Divisor) {
             Exit = 1;
         }
 
-        // printf("Aux:", Aux);
-        // puts(Aux);
-
         strcat(Result, Aux);
-        // printf("\nResult:");
-        // puts(Result);
 
         if (Exit) {
             break;
         }
 
         Decimal /= Divisor; 
-        // printf ("\nDecimal/: %d\n", Decimal);
     }
     strrev(Result);
 
@@ -96,62 +157,98 @@ void Convert(int Decimal, int Divisor) {
     Result = NULL;
 }
 
-void HandleOption(int Decimal, int Option) {
-    char* Result = NULL;
+void HandleFirstOption(int Decimal, int Option) {
     int Divisor = 0;
-
-    // printf ("Decimal: %d - Option: %d\n", Decimal, Option);
     
     switch(Option) {
         case Binary:
-            printf ("DecimalToBinary Begin\n");
             Divisor = BINARIO;
             break;
         
         case Octal:
-            printf ("DecimalToOctal Begin\n");
             Divisor = OCTAL;
             break;
         
         case Hexa:
-            printf ("DecimalToHexa Begin\n");
             Divisor = HEXA;
             break;
         
         default:
             int Aux = BINARIO;
-            Convert(Decimal, Aux);
+            ConvertDecimalToOthers(Decimal, Aux);
 
             Aux = OCTAL;
-            Convert(Decimal, Aux);
+            ConvertDecimalToOthers(Decimal, Aux);
 
             Aux = HEXA;
-            Convert(Decimal, Aux);
+            ConvertDecimalToOthers(Decimal, Aux);
             return;
     }
 
-    Convert(Decimal, Divisor);
+    ConvertDecimalToOthers(Decimal, Divisor);
 }
 
-int main() {
+int HandleHexaToDecimal(char* Value) {
     int Decimal = 0;
-    int Option;
-    int Index = 1;
 
-    printf ("********************\n");
-    while (Decimal >= 0) {
-        printf ("Digite um numero maior que 0:\n");
-        scanf ("%d", &Decimal);
-
-        printf ("Digite:\n[1] - Binario\n[2] - Octal\n[3] - Hexadecimal\n[4] - Todos\n\n");
-        printf ("Opcao: ");
-        scanf ("%d", &Option);
-        printf ("\n");
-
-        HandleOption(Decimal, Option - Index);
-        printf ("\n");
+    switch (*Value) {
+        case 'A':
+        Decimal = 10;
+        break;
+        case 'B':
+        Decimal = 11;
+        break;
+        case 'C':
+        Decimal = 12;
+        break;
+        case 'D':
+        Decimal = 13;
+        break;
+        case 'E':
+        Decimal = 14;
+        break;
+        case 'F':
+        Decimal = 15;
+        break;
+        default:
+            Decimal = (int)*Value - 48; //ASCII
+        break;
     }
-    printf ("********************\n");
+    
+    return Decimal;
+}
 
-    return 0;
+void HandleSecondOption(char* Aux, int Option) {
+    int Decimal = 0;
+
+    switch(Option) {
+        case Binary:
+            Decimal = ConvertOtherToDecimal(Aux, 2);
+            break;
+
+        case Octal:
+            Decimal = ConvertOtherToDecimal(Aux, 8);
+            break;
+        
+        case Hexa:
+            Decimal = ConvertOtherToDecimal(Aux, 16);
+            break;
+        
+        default:
+            return;
+    }
+
+    printf ("Resultado: %d\n", Decimal);
+}
+
+int ConvertOtherToDecimal(char* Aux, int Multiply) {
+    int Decimal = 0;
+    strrev(Aux);
+
+    for(int Index = 0; Index < strlen(Aux); ++Index) {
+        int CurrentValue = HandleHexaToDecimal(&Aux[Index]);
+        Decimal += (int)CurrentValue * (int)pow((double)Multiply, (double)Index);
+    }
+
+    return Decimal;
 }
