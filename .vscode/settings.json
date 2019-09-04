@@ -1,0 +1,14 @@
+{
+  "files.exclude": {
+    "*.exe": true,
+    "**/*.exe": true,
+    "*.obj": true,
+    "**/*.obj": true,
+    ".gitignore": true
+  },
+  "files.associations": {
+    "convertformats.h": "c",
+    "assert.h": "c",
+    "stdlib.h": "c"
+  }
+}
